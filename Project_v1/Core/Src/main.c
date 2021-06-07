@@ -33,6 +33,10 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define CONTROL_REG 0x80
+#define START_CONV 0x10
+#define TEMPR_REG 0x02
+#define FRAC_FLAG 0x00C0
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
