@@ -103,12 +103,69 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+	//GPIO_B_PIN2 = HC72_CE_Pin
 	char vterminal_data[256];
-  while (1)
+	int len;
+	uint8_t spi_tx_data[]= {0};
+	uint8_t spi_rx_data[]= {0};
+	uint8_t hc72_MSB =0;
+	uint8_t hc72_LSB =0;
+//	HAL_UART_Transmit(&huart1,(uint8_t*)vterminal_data, len+1, HAL_MAX_DELAY);
+ // HAL_Delay(1000);
+	 
+	len = sprintf(vterminal_data, "Configuring sensor... \r\n");
+	HAL_UART_Transmit(&huart1,(uint8_t*)vterminal_data, len+1, HAL_MAX_DELAY);
+  
+	//Configure temp sensor
+	//CE enable
+	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_2, GPIO_PIN_SET);
+	spi_tx_data[0]= CONTROL_REG;
+	if (HAL_SPI_Transmit(&hspi1,spi_tx_data,1, HAL_MAX_DELAY) != HAL_OK){
+	len = sprintf(vterminal_data, "Error... \r\n");
+	HAL_UART_Transmit(&huart1,(uint8_t*)vterminal_data, len+1, HAL_MAX_DELAY);
+	} 
+	spi_tx_data[0]= START_CONV;
+	if (HAL_SPI_Transmit(&hspi1,spi_tx_data,1, HAL_MAX_DELAY) != HAL_OK){
+	len = sprintf(vterminal_data, "Error... \r\n");
+	HAL_UART_Transmit(&huart1,(uint8_t*)vterminal_data, len+1, HAL_MAX_DELAY);
+	}
+	//CE disable
+	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_2, GPIO_PIN_RESET);
+	HAL_Delay(150);
+	//END configure temp sensor 
+	
+	while (1)
   {
-		int len = sprintf(vterminal_data, "Hello %d \r\n", 5);
-		HAL_UART_Transmit(&huart1,(uint8_t*)vterminal_data, len+1, HAL_MAX_DELAY);
-    HAL_Delay(1000);
+	//Read from temp sensor
+	len = sprintf(vterminal_data, "Read from the sensor... \r\n");
+	HAL_UART_Transmit(&huart1,(uint8_t*)vterminal_data, len+1, HAL_MAX_DELAY);
+	//CE enable
+	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_2, GPIO_PIN_SET);
+	spi_tx_data[0]= TEMPR_REG;
+	if (HAL_SPI_Transmit(&hspi1,spi_tx_data,1, HAL_MAX_DELAY) != HAL_OK){
+	len = sprintf(vterminal_data, "Error... \r\n");
+	HAL_UART_Transmit(&huart1,(uint8_t*)vterminal_data, len+1, HAL_MAX_DELAY);
+	} 
+	
+	if (HAL_SPI_Receive(&hspi1,spi_rx_data,1, HAL_MAX_DELAY) != HAL_OK){
+	len = sprintf(vterminal_data, "Error... \r\n");
+	HAL_UART_Transmit(&huart1,(uint8_t*)vterminal_data, len+1, HAL_MAX_DELAY);
+	}
+	
+	hc72_MSB = spi_rx_data[0];
+	if (HAL_SPI_Receive(&hspi1,spi_rx_data,1, HAL_MAX_DELAY) != HAL_OK){
+	len = sprintf(vterminal_data, "Error... \r\n");
+	HAL_UART_Transmit(&huart1,(uint8_t*)vterminal_data, len+1, HAL_MAX_DELAY);
+	}
+	
+	hc72_LSB = spi_rx_data[0];
+	//CE disable
+	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_2, GPIO_PIN_RESET);
+	HAL_Delay(10);
+	//END read from temp sensor
+	len = sprintf(vterminal_data, "MSB= %d, LSB= %d\r\n", hc72_MSB,hc72_LSB);
+	HAL_UART_Transmit(&huart1,(uint8_t*)vterminal_data, len+1, HAL_MAX_DELAY);
+			HAL_Delay(200);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
