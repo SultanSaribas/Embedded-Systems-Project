@@ -31,3 +31,4 @@ project_v1\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h
 project_v1\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h
 project_v1\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 project_v1\main.o: ../Core/Src/../../Drivers/TC72_mesu/hal_tc72.h
+project_v1\main.o: ..\MDK-ARM\LCD.h

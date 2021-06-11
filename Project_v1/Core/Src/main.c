@@ -24,6 +24,7 @@
 /* USER CODE BEGIN Includes */
 #include "stdio.h"
 #include "../../Drivers/TC72_mesu/hal_tc72.h"
+#include "LCD.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -59,6 +60,7 @@ static void MX_SPI1_Init(void);
 static void MX_USART1_UART_Init(void);
 static void MX_TIM3_Init(void);
 static void MX_USART2_UART_Init(void);
+
 /* USER CODE BEGIN PFP */
 //HUMIDITY VARIABLES
 uint16_t aa;
@@ -224,7 +226,7 @@ int main(void)
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_Base_Start(&htim3); 
-
+ lcd_init(_LCD_4BIT, _LCD_FONT_5x8, _LCD_2LINE);
 	HAL_TIM_OC_Start(&htim3, TIM_CHANNEL_1); //EKLENDI
   /* USER CODE END 2 */
 
@@ -291,8 +293,10 @@ int main(void)
 	//END read from temp sensor
 	len = sprintf(vterminal_data, "MSB= %d, LSB= %d\r\n", hc72_MSB,hc72_LSB);
 	HAL_UART_Transmit(&huart1,(uint8_t*)vterminal_data, len+1, HAL_MAX_DELAY);
+		lcd_print(1,1, "Temperature");
+ lcd_print(2,1, "Humidity");
 			HAL_Delay(200);
-	
+
 		//HUMIDITY
 	 HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_14);
 	 if(functionDHT11(dhtVal) == 1){
@@ -511,14 +515,21 @@ static void MX_GPIO_Init(void)
   GPIO_InitTypeDef GPIO_InitStruct = {0};
 
   /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOD_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_2|GPIO_PIN_14|GPIO_PIN_7, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_2|LCD_D7_Pin|GPIO_PIN_14|LCD_EN_Pin
+                          |LCD_RS_Pin|LCD_D4_Pin|GPIO_PIN_7|LCD_D5_Pin
+                          |LCD_D6_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pins : PB2 PB14 PB7 */
-  GPIO_InitStruct.Pin = GPIO_PIN_2|GPIO_PIN_14|GPIO_PIN_7;
+  /*Configure GPIO pins : PB2 LCD_D7_Pin PB14 LCD_EN_Pin
+                           LCD_RS_Pin LCD_D4_Pin PB7 LCD_D5_Pin
+                           LCD_D6_Pin */
+  GPIO_InitStruct.Pin = GPIO_PIN_2|LCD_D7_Pin|GPIO_PIN_14|LCD_EN_Pin
+                          |LCD_RS_Pin|LCD_D4_Pin|GPIO_PIN_7|LCD_D5_Pin
+                          |LCD_D6_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;

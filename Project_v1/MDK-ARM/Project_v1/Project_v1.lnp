@@ -1,5 +1,6 @@
 --cpu Cortex-M3
 "project_v1\startup_stm32f103x6.o"
+"project_v1\lcd.o"
 "project_v1\main.o"
 "project_v1\stm32f1xx_it.o"
 "project_v1\stm32f1xx_hal_msp.o"
