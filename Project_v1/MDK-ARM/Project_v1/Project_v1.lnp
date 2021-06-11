@@ -3,7 +3,6 @@
 "project_v1\main.o"
 "project_v1\stm32f1xx_it.o"
 "project_v1\stm32f1xx_hal_msp.o"
-"project_v1\hal_tc72.o"
 "project_v1\stm32f1xx_hal_gpio_ex.o"
 "project_v1\stm32f1xx_hal_spi.o"
 "project_v1\stm32f1xx_hal.o"
