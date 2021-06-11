@@ -60,7 +60,7 @@ static void MX_USART1_UART_Init(void);
 static void MX_TIM3_Init(void);
 static void MX_USART2_UART_Init(void);
 /* USER CODE BEGIN PFP */
-//HUMIDITY
+//HUMIDITY VARIABLES
 uint16_t aa;
 uint8_t dhtVal[2];
 char sendData[128];
@@ -70,32 +70,24 @@ char sendData[128];
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 //HUMIDITY
-//give microsecond delay
-void mDelay(uint32_t mDelay)
-{
-	uint16_t initTime = (uint16_t)__HAL_TIM_GET_COUNTER(&htim3);			//get initial time
-	while(((uint16_t)__HAL_TIM_GET_COUNTER(&htim3)-initTime) < mDelay){		//wait until (time now - inital time == 0) 
-	}	
-}
 
 #define OUTPUT 1
 #define INPUT 0
 
-//set DHT pin direction with given parameter
-void set_gpio_mode(uint8_t pMode)
+//change pin direction 
+void set_mode(uint8_t gmode)
 {
 	GPIO_InitTypeDef GPIO_InitStruct = {0};
 	
 	//if direction parameter OUTPUT 
-	if(pMode == OUTPUT)
+	if(gmode == OUTPUT)
 	{
-	/*Configure GPIO pins : LD3_Pin LD2_Pin */
 	  GPIO_InitStruct.Pin = GPIO_PIN_4;
 	  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
 	  GPIO_InitStruct.Pull = GPIO_NOPULL;
 	  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
 	  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-	}else if(pMode == INPUT)   //else if direction parameter INPUT
+	}else if(gmode == INPUT)   //if direction parameter INPUT
 	{
 	  GPIO_InitStruct.Pin = GPIO_PIN_4;
 	  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
@@ -105,19 +97,18 @@ void set_gpio_mode(uint8_t pMode)
 	}
 }
 
-uint8_t readDHT11(uint8_t *pData)
+uint8_t functionDHT11(uint8_t *pData)
 {
 	uint16_t mTime1 = 0, mTime2 = 0, mBit = 0;
 	uint8_t humVal = 0, tempVal = 0, parityVal = 0, genParity = 0;
 	uint8_t mData[40];
 
-	//start comm
-	set_gpio_mode(OUTPUT);			//set pin direction as input
+	set_mode(OUTPUT);			
 	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_RESET);
-	HAL_Delay(20);					//wait 20 ms in Low state
-	set_gpio_mode(INPUT);			//set pin direction as input
+	HAL_Delay(20);		
+	set_mode(INPUT);			
 
-	//check dht answer
+	//check dht11 response
 	__HAL_TIM_SET_COUNTER(&htim3, 0);				//set timer counter to zero
 	while(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_4) == GPIO_PIN_SET) if((uint16_t)__HAL_TIM_GET_COUNTER(&htim3) > 500) return 0;
 	__HAL_TIM_SET_COUNTER(&htim3, 0);
@@ -127,7 +118,7 @@ uint8_t readDHT11(uint8_t *pData)
 	while(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_4) == GPIO_PIN_SET) if((uint16_t)__HAL_TIM_GET_COUNTER(&htim3) > 500) return 0;
 	mTime2 = (uint16_t)__HAL_TIM_GET_COUNTER(&htim3);
 
-	//if answer is wrong return
+	//Error 
 	if(mTime1 < 75 && mTime1 > 85 && mTime2 < 75 && mTime2 > 85)
 	{
 		HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_14);
@@ -303,22 +294,17 @@ int main(void)
 			HAL_Delay(200);
 	
 		//HUMIDITY
-			  HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_14);
-
-	  if(readDHT11(dhtVal) == 1)
-	  {
-
-		  uint16_t len = sprintf(sendData, "Hum: %d Temp: %d\n\r", dhtVal[1], dhtVal[0]);
-
-	  	  HAL_UART_Transmit(&huart2, (uint8_t*)sendData, len+1, HAL_MAX_DELAY);
-
-	  }else{
-		  uint16_t len = sprintf(sendData, "DHT Read Error!!\n\r");
-
+	 HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_14);
+	 if(functionDHT11(dhtVal) == 1){
+			uint16_t len = sprintf(sendData, "Hummudity: %d Temperature: %d\n\r", dhtVal[1], dhtVal[0]);
+	  	HAL_UART_Transmit(&huart2, (uint8_t*)sendData, len+1, HAL_MAX_DELAY);
+	 }
+	 else{
+		  uint16_t len = sprintf(sendData, "Error!!\n\r");
 		  HAL_UART_Transmit(&huart2, (uint8_t*)sendData, len+1, HAL_MAX_DELAY);
-	  }
-
-	  HAL_Delay(3000);
+	 }
+		
+	 HAL_Delay(3000);
 		//END HUMIDITY
     /* USER CODE END WHILE */
 
