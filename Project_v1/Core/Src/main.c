@@ -42,6 +42,9 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+ADC_HandleTypeDef hadc1;
+DMA_HandleTypeDef hdma_adc1;
+
 SPI_HandleTypeDef hspi1;
 
 TIM_HandleTypeDef htim3;
@@ -56,11 +59,12 @@ UART_HandleTypeDef huart2;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
+static void MX_DMA_Init(void);
 static void MX_SPI1_Init(void);
 static void MX_USART1_UART_Init(void);
 static void MX_TIM3_Init(void);
 static void MX_USART2_UART_Init(void);
-
+static void MX_ADC1_Init(void);
 /* USER CODE BEGIN PFP */
 //HUMIDITY VARIABLES
 uint16_t aa;
@@ -71,6 +75,9 @@ char sendData[128];
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+//LED
+int flag = 0;
+
 //HUMIDITY
 
 #define OUTPUT 1
@@ -199,6 +206,12 @@ uint8_t functionDHT11(uint8_t *pData)
 int main(void)
 {
   /* USER CODE BEGIN 1 */
+	
+	//LED
+	uint32_t ADC_value[100];
+	uint8_t k;
+	uint32_t ad1, ad2;
+	//end
 
   /* USER CODE END 1 */
 
@@ -220,11 +233,17 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_SPI1_Init();
   MX_USART1_UART_Init();
   MX_TIM3_Init();
   MX_USART2_UART_Init();
+  MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
+	//LED
+	HAL_ADC_Start_DMA(&hadc1,(uint32_t*)&ADC_value,100);
+  //end
+
   HAL_TIM_Base_Start(&htim3); 
 	//LCD
  lcd_init(_LCD_4BIT, _LCD_FONT_5x8, _LCD_2LINE);
@@ -265,10 +284,29 @@ int main(void)
 	//CE disable
 	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_2, GPIO_PIN_RESET);
 	HAL_Delay(150);
-	//END configure temp sensor 
+	//END configure temp sensor
+	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_15, GPIO_PIN_RESET);
 	
 	while (1)
   {
+	//LED
+	if(flag==1){    
+      flag=0; 
+			sprintf(yazi, "%d", ((65535/(4096-ADC_value[0]))-15));
+			//sprintf(yazi, "%d", ADC_value[0]);
+			lcd_print(2,1,yazi);
+      HAL_Delay(1000);
+			if(ADC_value[0] < 1822){
+				HAL_GPIO_WritePin(GPIOB, GPIO_PIN_15, GPIO_PIN_SET);
+			}
+			else{
+				HAL_GPIO_WritePin(GPIOB, GPIO_PIN_15, GPIO_PIN_RESET);
+			}
+    }
+ 
+   
+ 
+
 	//Read from temp sensor
 	len = sprintf(vterminal_data, "Read from the sensor... \r\n");
 	HAL_UART_Transmit(&huart1,(uint8_t*)vterminal_data, len+1, HAL_MAX_DELAY);
@@ -304,8 +342,8 @@ int main(void)
 			HAL_Delay(200);
 
 	//i++;
-	sprintf(yazi, "%d", hc72_MSB);
-	lcd_print(2,1,yazi);
+	//sprintf(yazi, "%d", hc72_MSB);
+	//lcd_print(2,1,yazi);
 	HAL_Delay(30);
 	//LCD END
 		//HUMIDITY
@@ -321,6 +359,7 @@ int main(void)
 		
 	 HAL_Delay(3000);
 		//END HUMIDITY
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -336,6 +375,7 @@ void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+  RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
 
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
@@ -361,6 +401,57 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
+  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_ADC;
+  PeriphClkInit.AdcClockSelection = RCC_ADCPCLK2_DIV2;
+  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
+  {
+    Error_Handler();
+  }
+}
+
+/**
+  * @brief ADC1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_ADC1_Init(void)
+{
+
+  /* USER CODE BEGIN ADC1_Init 0 */
+
+  /* USER CODE END ADC1_Init 0 */
+
+  ADC_ChannelConfTypeDef sConfig = {0};
+
+  /* USER CODE BEGIN ADC1_Init 1 */
+
+  /* USER CODE END ADC1_Init 1 */
+  /** Common config
+  */
+  hadc1.Instance = ADC1;
+  hadc1.Init.ScanConvMode = ADC_SCAN_DISABLE;
+  hadc1.Init.ContinuousConvMode = ENABLE;
+  hadc1.Init.DiscontinuousConvMode = DISABLE;
+  hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
+  hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
+  hadc1.Init.NbrOfConversion = 1;
+  if (HAL_ADC_Init(&hadc1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /** Configure Regular Channel
+  */
+  sConfig.Channel = ADC_CHANNEL_8;
+  sConfig.Rank = ADC_REGULAR_RANK_1;
+  sConfig.SamplingTime = ADC_SAMPLETIME_1CYCLE_5;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN ADC1_Init 2 */
+
+  /* USER CODE END ADC1_Init 2 */
+
 }
 
 /**
@@ -517,6 +608,22 @@ static void MX_USART2_UART_Init(void)
 }
 
 /**
+  * Enable DMA controller clock
+  */
+static void MX_DMA_Init(void)
+{
+
+  /* DMA controller clock enable */
+  __HAL_RCC_DMA1_CLK_ENABLE();
+
+  /* DMA interrupt init */
+  /* DMA1_Channel1_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Channel1_IRQn);
+
+}
+
+/**
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
@@ -531,16 +638,16 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_2|LCD_D7_Pin|GPIO_PIN_14|LCD_EN_Pin
-                          |LCD_RS_Pin|LCD_D4_Pin|GPIO_PIN_7|LCD_D5_Pin
-                          |LCD_D6_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_2|LCD_D7_Pin|GPIO_PIN_14|GPIO_PIN_15
+                          |LCD_EN_Pin|LCD_RS_Pin|LCD_D4_Pin|GPIO_PIN_7
+                          |LCD_D5_Pin|LCD_D6_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pins : PB2 LCD_D7_Pin PB14 LCD_EN_Pin
-                           LCD_RS_Pin LCD_D4_Pin PB7 LCD_D5_Pin
-                           LCD_D6_Pin */
-  GPIO_InitStruct.Pin = GPIO_PIN_2|LCD_D7_Pin|GPIO_PIN_14|LCD_EN_Pin
-                          |LCD_RS_Pin|LCD_D4_Pin|GPIO_PIN_7|LCD_D5_Pin
-                          |LCD_D6_Pin;
+  /*Configure GPIO pins : PB2 LCD_D7_Pin PB14 PB15
+                           LCD_EN_Pin LCD_RS_Pin LCD_D4_Pin PB7
+                           LCD_D5_Pin LCD_D6_Pin */
+  GPIO_InitStruct.Pin = GPIO_PIN_2|LCD_D7_Pin|GPIO_PIN_14|GPIO_PIN_15
+                          |LCD_EN_Pin|LCD_RS_Pin|LCD_D4_Pin|GPIO_PIN_7
+                          |LCD_D5_Pin|LCD_D6_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -549,6 +656,12 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc){
+
+	flag=1;
+ 
+//HAL_ADC_Stop_DMA(hadc);
+}
 
 /* USER CODE END 4 */
 

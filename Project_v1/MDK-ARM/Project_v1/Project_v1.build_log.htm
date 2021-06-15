@@ -3,9 +3,9 @@
 <pre>
 <h1>µVision Build Log</h1>
 <h2>Tool Versions:</h2>
-IDE-Version: ÂµVision V5.33.0.0
+IDE-Version: µVision V5.33.0.0
 Copyright (C) 2020 ARM Ltd and ARM Germany GmbH. All rights reserved.
-License Information: Sultan Saribas, Abdullah Gül University, LIC=----
+License Information: Melike Doðru, Non, LIC=----
  
 Tool Versions:
 Toolchain:       MDK-Lite  Version: 5.33.0.0
@@ -21,8 +21,8 @@ Target DLL:      STLink\ST-LINKIII-KEIL_SWO.dll V3.0.8.0
 Dialog DLL:      TCM.DLL V1.48.0.0
  
 <h2>Project:</h2>
-C:\Users\sarib\Desktop\Faculty\7. Semester\EE304\PROJECT\Version1\Embedded-Systems-Project\Project_v1\MDK-ARM\Project_v1.uvprojx
-Project File Date:  06/11/2021
+C:\Users\life\Documents\PROJECT\KEIL\Embedded-Systems-Project\Project_v1\MDK-ARM\Project_v1.uvprojx
+Project File Date:  06/15/2021
 
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 7 (build 960)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
@@ -38,32 +38,40 @@ compiling main.c...
   #endif /* __STM32F1xx_HAL_FLASH_H */
 ..\MDK-ARM\LCD.h(37): warning:  #1-D: last line of file ends without a newline
   void lcd_line2(void);
-../Core/Src/main.c(190): warning:  #940-D: missing return statement at end of non-void function "functionDHT11" 
+../Core/Src/main.c(197): warning:  #940-D: missing return statement at end of non-void function "functionDHT11" 
   }
-../Core/Src/main.c(231): warning:  #177-D: variable "i"  was declared but never referenced
+../Core/Src/main.c(212): warning:  #177-D: variable "k"  was declared but never referenced
+  	uint8_t k;
+../Core/Src/main.c(213): warning:  #177-D: variable "ad1"  was declared but never referenced
+  	uint32_t ad1, ad2;
+../Core/Src/main.c(213): warning:  #177-D: variable "ad2"  was declared but never referenced
+  	uint32_t ad1, ad2;
+../Core/Src/main.c(250): warning:  #177-D: variable "i"  was declared but never referenced
    int i=0;
-../Core/Src/main.c: 4 warnings, 0 errors
+../Core/Src/main.c: 7 warnings, 0 errors
 compiling stm32f1xx_hal_gpio_ex.c...
 compiling stm32f1xx_hal_msp.c...
-compiling stm32f1xx_hal_spi.c...
+compiling stm32f1xx_hal_adc.c...
 compiling stm32f1xx_hal.c...
-compiling stm32f1xx_hal_rcc_ex.c...
+compiling stm32f1xx_hal_adc_ex.c...
 compiling stm32f1xx_hal_rcc.c...
+compiling stm32f1xx_hal_rcc_ex.c...
 compiling stm32f1xx_hal_gpio.c...
-compiling stm32f1xx_hal_cortex.c...
 compiling stm32f1xx_hal_dma.c...
+compiling stm32f1xx_hal_cortex.c...
 compiling stm32f1xx_hal_pwr.c...
-compiling stm32f1xx_hal_flash_ex.c...
 compiling stm32f1xx_hal_flash.c...
 compiling stm32f1xx_hal_exti.c...
+compiling stm32f1xx_hal_flash_ex.c...
+compiling stm32f1xx_hal_spi.c...
+compiling stm32f1xx_hal_uart.c...
 compiling stm32f1xx_hal_tim_ex.c...
 compiling stm32f1xx_hal_tim.c...
 compiling system_stm32f1xx.c...
-compiling stm32f1xx_hal_uart.c...
 linking...
-Program Size: Code=9132 RO-data=324 RW-data=20 ZI-data=1444  
+Program Size: Code=11772 RO-data=324 RW-data=24 ZI-data=1560  
 FromELF: creating hex file...
-"Project_v1\Project_v1.axf" - 0 Error(s), 5 Warning(s).
+"Project_v1\Project_v1.axf" - 0 Error(s), 8 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -80,14 +88,14 @@ Package Vendor: Keil
 
 <h2>Collection of Component include folders:</h2>
   .\RTE\_Project_v1
-  C:\Users\sarib\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include
-  C:\Users\sarib\AppData\Local\Arm\Packs\Keil\STM32F1xx_DFP\2.3.0\Device\Include
+  C:\Users\life\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include
+  C:\Users\life\AppData\Local\Arm\Packs\Keil\STM32F1xx_DFP\2.3.0\Device\Include
 
 <h2>Collection of Component Files used:</h2>
 
    * Component: ARM::CMSIS:CORE:5.4.0
       Include file:  CMSIS\Core\Include\tz_context.h
-Build Time Elapsed:  00:00:24
+Build Time Elapsed:  00:00:23
 </pre>
 </body>
 </html>
