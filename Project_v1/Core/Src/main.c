@@ -195,12 +195,15 @@ int main(void)
 	//END configure temp sensor
 	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_15, GPIO_PIN_RESET);
 	
-	uint8_t counter = 1;
-	uint8_t n = 6;
-  uint32_t x[100]={1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25};	//times
-  uint32_t y[100]; // values
-  y[0] = 1822;
+	uint8_t counter = 10;
+	uint8_t n = 10;
+  //uint32_t x[25]={1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25};	//times
+  uint32_t x[10]={1,2,3,4,5,6,7,8,9,10};
+	uint32_t y[10]={15,15,15,15,15,15,15,15,15,15}; // values
+  //y[0] = 1822;
 	uint8_t prediction;
+	uint8_t predictionx;
+	uint8_t temp=0;
 	//uint32_t x[6]= {1, 2, 3,  4,  5, 6};
   //uint32_t y[6]= {1, 2, 4,  5,  10, 20};
 	
@@ -209,24 +212,28 @@ int main(void)
 	//LED
 	if(flag==1){    
       flag=0;
-			//sprintf(yazi, "%d", ((65535/(4096-ADC_value[0]))-13));
-			//lcd_print(2,1,yazi);
-      HAL_Delay(1000);
+			temp=((65535/(4096-ADC_value[0]))-13);
+			sprintf(yazi, "%d", ((65535/(4096-ADC_value[0]))-13));
+			lcd_print(1,1,yazi);
+      //temp = ADC_value[0];
+			y[counter] = temp;
+			HAL_Delay(1000);
 			if(ADC_value[0] < 1822){
 				HAL_GPIO_WritePin(GPIOB, GPIO_PIN_15, GPIO_PIN_SET);
 			}
 			else{
 				HAL_GPIO_WritePin(GPIOB, GPIO_PIN_15, GPIO_PIN_RESET);
 			}
-			//x[counter] = counter;
-			y[counter] = ADC_value[0];
-			counter++;
-			HAL_Delay(1000);
-			linearregression(1,x,y);
-			HAL_Delay(1000);
-			sprintf(yazi, "%d", m);
+			
+			counter--;
+			HAL_Delay(100);
+			linearregression(10,x,y);
+			prediction = m*11+b;
+			//predictionx=((65535/(4096-prediction))-13);
+			HAL_Delay(100);
+			sprintf(yazi, "%d", prediction);
 			lcd_print(2,1,yazi);
-			HAL_Delay(1000);
+			HAL_Delay(100);
    }
 	
 
@@ -264,7 +271,7 @@ int main(void)
 	len = sprintf(vterminal_data, "MSB= %d, LSB= %d\r\n", hc72_MSB,hc72_LSB);
 	HAL_UART_Transmit(&huart1,(uint8_t*)vterminal_data, len+1, HAL_MAX_DELAY);
 	//LCD
-	lcd_print(1,1, "Temperature");
+	//lcd_print(1,1, "Temperature");
 			HAL_Delay(200);
 
 	//i++;
