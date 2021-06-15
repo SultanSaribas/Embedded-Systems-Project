@@ -79,7 +79,6 @@ char sendData[128];
 int flag = 0;
 
 //HUMIDITY
-
 #define OUTPUT 1
 #define INPUT 0
 
@@ -293,7 +292,6 @@ int main(void)
 	if(flag==1){    
       flag=0; 
 			sprintf(yazi, "%d", ((65535/(4096-ADC_value[0]))-15));
-			//sprintf(yazi, "%d", ADC_value[0]);
 			lcd_print(2,1,yazi);
       HAL_Delay(1000);
 			if(ADC_value[0] < 1822){
