@@ -25,6 +25,8 @@
 #include "stdio.h"
 #include "../../Drivers/TC72_mesu/hal_tc72.h"
 #include "LCD.h"
+#include "stdlib.h"
+#include "math.h" 
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -34,6 +36,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+
 
 /* USER CODE END PD */
 
@@ -68,6 +71,41 @@ static void MX_ADC1_Init(void);
 /* USER CODE BEGIN 0 */
 //LED
 int flag = 0;
+static uint8_t m;
+static uint8_t b;
+static uint8_t r;
+
+//y=mx+b
+
+void linearregression(uint8_t n, uint32_t x[], uint32_t y[]){
+	double sumx = 0.0;
+	double sumx2 = 0.0;
+	double sumxy = 0.0;
+	double sumy = 0.0;
+	double sumy2 = 0.0;
+	
+	for (int i=0;i<n;i++){
+		    sumx  += x[i];       
+        sumx2 += (x[i]*x[i]);  
+        sumxy += x[i] * y[i];
+        sumy  += y[i];      
+        sumy2 += (y[i]*y[i]);
+	}
+	
+	double denom = ((n*sumx2) - (sumx*sumx));
+	if (denom == 0){
+		m =0;
+		b=0;
+		r=0;
+	}
+	else{
+		m=(n*sumxy - sumx*sumy)/denom;
+		b=(sumy*sumx2 - sumx*sumxy)/denom;
+		if (r!=NULL){
+			r=(sumxy-sumx * sumy/n)/(sumx2 - ((sumx*sumx)/n))*(sumy2 - ((sumy*sumy)/n))*(sumx2 - ((sumx*sumx)/n))*(sumy2 - ((sumy*sumy)/n));
+		}
+	}
+}
 
 /* USER CODE END 0 */
 
@@ -157,13 +195,22 @@ int main(void)
 	//END configure temp sensor
 	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_15, GPIO_PIN_RESET);
 	
+	uint8_t counter = 1;
+	uint8_t n = 6;
+  uint32_t x[100]={1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25};	//times
+  uint32_t y[100]; // values
+  y[0] = 1822;
+	uint8_t prediction;
+	//uint32_t x[6]= {1, 2, 3,  4,  5, 6};
+  //uint32_t y[6]= {1, 2, 4,  5,  10, 20};
+	
 	while (1)
   {
 	//LED
 	if(flag==1){    
-      flag=0; 
-			sprintf(yazi, "%d", ((65535/(4096-ADC_value[0]))-15));
-			lcd_print(2,1,yazi);
+      flag=0;
+			//sprintf(yazi, "%d", ((65535/(4096-ADC_value[0]))-13));
+			//lcd_print(2,1,yazi);
       HAL_Delay(1000);
 			if(ADC_value[0] < 1822){
 				HAL_GPIO_WritePin(GPIOB, GPIO_PIN_15, GPIO_PIN_SET);
@@ -171,9 +218,20 @@ int main(void)
 			else{
 				HAL_GPIO_WritePin(GPIOB, GPIO_PIN_15, GPIO_PIN_RESET);
 			}
-    }
- 
-   
+			//x[counter] = counter;
+			y[counter] = ADC_value[0];
+			counter++;
+			HAL_Delay(1000);
+			linearregression(1,x,y);
+			HAL_Delay(1000);
+			sprintf(yazi, "%d", m);
+			lcd_print(2,1,yazi);
+			HAL_Delay(1000);
+   }
+	
+
+		
+
  
 
 	//Read from temp sensor
