@@ -47,10 +47,7 @@ DMA_HandleTypeDef hdma_adc1;
 
 SPI_HandleTypeDef hspi1;
 
-TIM_HandleTypeDef htim3;
-
 UART_HandleTypeDef huart1;
-UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
 
@@ -62,15 +59,9 @@ static void MX_GPIO_Init(void);
 static void MX_DMA_Init(void);
 static void MX_SPI1_Init(void);
 static void MX_USART1_UART_Init(void);
-static void MX_TIM3_Init(void);
-static void MX_USART2_UART_Init(void);
 static void MX_ADC1_Init(void);
 /* USER CODE BEGIN PFP */
-//HUMIDITY VARIABLES
-uint16_t aa;
-uint8_t dhtVal[2];
-char sendData[128];
-//HUMIDITY END
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -78,124 +69,6 @@ char sendData[128];
 //LED
 int flag = 0;
 
-//HUMIDITY
-#define OUTPUT 1
-#define INPUT 0
-
-//change pin direction 
-void set_mode(uint8_t gmode)
-{
-	GPIO_InitTypeDef GPIO_InitStruct = {0};
-	
-	//if direction parameter OUTPUT 
-	if(gmode == OUTPUT)
-	{
-	  GPIO_InitStruct.Pin = GPIO_PIN_4;
-	  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-	  GPIO_InitStruct.Pull = GPIO_NOPULL;
-	  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-	  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-	}else if(gmode == INPUT)   //if direction parameter INPUT
-	{
-	  GPIO_InitStruct.Pin = GPIO_PIN_4;
-	  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-	  GPIO_InitStruct.Pull = GPIO_NOPULL;
-	  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-	  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-	}
-}
-
-uint8_t functionDHT11(uint8_t *pData)
-{
-	uint16_t mTime1 = 0, mTime2 = 0, mBit = 0;
-	uint8_t humVal = 0, tempVal = 0, parityVal = 0, genParity = 0;
-	uint8_t mData[40];
-
-	set_mode(OUTPUT);			
-	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_RESET);
-	HAL_Delay(20);		
-	set_mode(INPUT);			
-
-	//check dht11 response
-	__HAL_TIM_SET_COUNTER(&htim3, 0);				//set timer counter to zero
-	while(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_4) == GPIO_PIN_SET) if((uint16_t)__HAL_TIM_GET_COUNTER(&htim3) > 500) return 0;
-	__HAL_TIM_SET_COUNTER(&htim3, 0);
-	while(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_4) == GPIO_PIN_RESET) if((uint16_t)__HAL_TIM_GET_COUNTER(&htim3) > 500) return 0;
-	mTime1 = (uint16_t)__HAL_TIM_GET_COUNTER(&htim3);
-	__HAL_TIM_SET_COUNTER(&htim3, 0);
-	while(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_4) == GPIO_PIN_SET) if((uint16_t)__HAL_TIM_GET_COUNTER(&htim3) > 500) return 0;
-	mTime2 = (uint16_t)__HAL_TIM_GET_COUNTER(&htim3);
-
-	//Error 
-	if(mTime1 < 75 && mTime1 > 85 && mTime2 < 75 && mTime2 > 85)
-	{
-		HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_14);
-		return 0;
-	}
-
-	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_7, GPIO_PIN_SET);
-	for(int j = 0; j < 40; j++)
-	{
-		__HAL_TIM_SET_COUNTER(&htim3, 0);
-		while(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_4) == GPIO_PIN_RESET) if((uint16_t)__HAL_TIM_GET_COUNTER(&htim3) > 500) return 0;
-		__HAL_TIM_SET_COUNTER(&htim3, 0);
-		while(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_4) == GPIO_PIN_SET) if((uint16_t)__HAL_TIM_GET_COUNTER(&htim3) > 500) return 0;
-		mTime1 = (uint16_t)__HAL_TIM_GET_COUNTER(&htim3);
-
-		//check pass time in high state
-		//if pass time 25uS set as LOW
-		if(mTime1 > 20 && mTime1 < 30)
-		{
-			mBit = 0;
-		}
-		else if(mTime1 > 60 && mTime1 < 80) //if pass time 70 uS set as HIGH
-		{
-			 mBit = 1;
-		}
-
-		//set i th data in data buffer
-		mData[j] = mBit;
-		
-		//get hum value from data buffer
-	for(int i = 0; i < 8; i++)
-	{
-		humVal += mData[i];
-		humVal = humVal << 1;
-	}
-
-	//get temp value from data buffer
-	for(int i = 16; i < 24; i++)
-	{
-		tempVal += mData[i];
-		tempVal = tempVal << 1;
-	}
-
-	//get parity value from data buffer
-	for(int i = 32; i < 40; i++)
-	{
-		parityVal += mData[i];
-		parityVal = parityVal << 1;
-	}
-
-	parityVal = parityVal >> 1;
-	humVal = humVal >> 1;
-	tempVal = tempVal >> 1;
-
-	genParity = humVal + tempVal;
-
-	if(genParity == parityVal)
-
-	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_7, GPIO_PIN_RESET);
-
-	pData[0] = tempVal;
-	pData[1] = humVal;
-
-	return 1;
-
-	}
-}
-
-//HUMIDITY END
 /* USER CODE END 0 */
 
 /**
@@ -235,22 +108,20 @@ int main(void)
   MX_DMA_Init();
   MX_SPI1_Init();
   MX_USART1_UART_Init();
-  MX_TIM3_Init();
-  MX_USART2_UART_Init();
   MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
-	//LED
+	
+	//LDR
 	HAL_ADC_Start_DMA(&hadc1,(uint32_t*)&ADC_value,100);
-  //end
+  // LDR END
 
-  HAL_TIM_Base_Start(&htim3); 
 	//LCD
  lcd_init(_LCD_4BIT, _LCD_FONT_5x8, _LCD_2LINE);
  int i=0;
  char yazi[32]=" ";
  HAL_Delay(250);
  //LCD END
-	HAL_TIM_OC_Start(&htim3, TIM_CHANNEL_1); //EKLENDI
+ 
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -336,7 +207,6 @@ int main(void)
 	HAL_UART_Transmit(&huart1,(uint8_t*)vterminal_data, len+1, HAL_MAX_DELAY);
 	//LCD
 	lcd_print(1,1, "Temperature");
- //lcd_print(2,1, "Humidity");
 			HAL_Delay(200);
 
 	//i++;
@@ -344,19 +214,6 @@ int main(void)
 	//lcd_print(2,1,yazi);
 	HAL_Delay(30);
 	//LCD END
-		//HUMIDITY
-	 HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_14);
-	 if(functionDHT11(dhtVal) == 1){
-			uint16_t len = sprintf(sendData, "Hummudity: %d Temperature: %d\n\r", dhtVal[1], dhtVal[0]);
-	  	HAL_UART_Transmit(&huart2, (uint8_t*)sendData, len+1, HAL_MAX_DELAY);
-	 }
-	 else{
-		  uint16_t len = sprintf(sendData, "Error!!\n\r");
-		  HAL_UART_Transmit(&huart2, (uint8_t*)sendData, len+1, HAL_MAX_DELAY);
-	 }
-		
-	 HAL_Delay(3000);
-		//END HUMIDITY
 
     /* USER CODE END WHILE */
 
@@ -491,55 +348,6 @@ static void MX_SPI1_Init(void)
 }
 
 /**
-  * @brief TIM3 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_TIM3_Init(void)
-{
-
-  /* USER CODE BEGIN TIM3_Init 0 */
-
-  /* USER CODE END TIM3_Init 0 */
-
-  TIM_MasterConfigTypeDef sMasterConfig = {0};
-  TIM_OC_InitTypeDef sConfigOC = {0};
-
-  /* USER CODE BEGIN TIM3_Init 1 */
-
-  /* USER CODE END TIM3_Init 1 */
-  htim3.Instance = TIM3;
-  htim3.Init.Prescaler = 108;
-  htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim3.Init.Period = 65535;
-  htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-  htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
-  if (HAL_TIM_OC_Init(&htim3) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
-  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
-  if (HAL_TIMEx_MasterConfigSynchronization(&htim3, &sMasterConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  sConfigOC.OCMode = TIM_OCMODE_TIMING;
-  sConfigOC.Pulse = 0;
-  sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
-  sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
-  if (HAL_TIM_OC_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN TIM3_Init 2 */
-
-  /* USER CODE END TIM3_Init 2 */
-  HAL_TIM_MspPostInit(&htim3);
-
-}
-
-/**
   * @brief USART1 Initialization Function
   * @param None
   * @retval None
@@ -569,39 +377,6 @@ static void MX_USART1_UART_Init(void)
   /* USER CODE BEGIN USART1_Init 2 */
 
   /* USER CODE END USART1_Init 2 */
-
-}
-
-/**
-  * @brief USART2 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_USART2_UART_Init(void)
-{
-
-  /* USER CODE BEGIN USART2_Init 0 */
-
-  /* USER CODE END USART2_Init 0 */
-
-  /* USER CODE BEGIN USART2_Init 1 */
-
-  /* USER CODE END USART2_Init 1 */
-  huart2.Instance = USART2;
-  huart2.Init.BaudRate = 9600;
-  huart2.Init.WordLength = UART_WORDLENGTH_8B;
-  huart2.Init.StopBits = UART_STOPBITS_1;
-  huart2.Init.Parity = UART_PARITY_NONE;
-  huart2.Init.Mode = UART_MODE_TX_RX;
-  huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-  huart2.Init.OverSampling = UART_OVERSAMPLING_16;
-  if (HAL_UART_Init(&huart2) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN USART2_Init 2 */
-
-  /* USER CODE END USART2_Init 2 */
 
 }
 
@@ -636,16 +411,13 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_2|LCD_D7_Pin|GPIO_PIN_14|GPIO_PIN_15
-                          |LCD_EN_Pin|LCD_RS_Pin|LCD_D4_Pin|GPIO_PIN_7
-                          |LCD_D5_Pin|LCD_D6_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_2|LCD_D7_Pin|GPIO_PIN_15|LCD_EN_Pin
+                          |LCD_RS_Pin|LCD_D4_Pin|LCD_D5_Pin|LCD_D6_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pins : PB2 LCD_D7_Pin PB14 PB15
-                           LCD_EN_Pin LCD_RS_Pin LCD_D4_Pin PB7
-                           LCD_D5_Pin LCD_D6_Pin */
-  GPIO_InitStruct.Pin = GPIO_PIN_2|LCD_D7_Pin|GPIO_PIN_14|GPIO_PIN_15
-                          |LCD_EN_Pin|LCD_RS_Pin|LCD_D4_Pin|GPIO_PIN_7
-                          |LCD_D5_Pin|LCD_D6_Pin;
+  /*Configure GPIO pins : PB2 LCD_D7_Pin PB15 LCD_EN_Pin
+                           LCD_RS_Pin LCD_D4_Pin LCD_D5_Pin LCD_D6_Pin */
+  GPIO_InitStruct.Pin = GPIO_PIN_2|LCD_D7_Pin|GPIO_PIN_15|LCD_EN_Pin
+                          |LCD_RS_Pin|LCD_D4_Pin|LCD_D5_Pin|LCD_D6_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;

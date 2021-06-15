@@ -3,9 +3,9 @@
 <pre>
 <h1>µVision Build Log</h1>
 <h2>Tool Versions:</h2>
-IDE-Version: µVision V5.33.0.0
+IDE-Version: ÂµVision V5.33.0.0
 Copyright (C) 2020 ARM Ltd and ARM Germany GmbH. All rights reserved.
-License Information: Melike Doðru, Non, LIC=----
+License Information: Sultan Saribas, Abdullah Gül University, LIC=----
  
 Tool Versions:
 Toolchain:       MDK-Lite  Version: 5.33.0.0
@@ -21,7 +21,7 @@ Target DLL:      STLink\ST-LINKIII-KEIL_SWO.dll V3.0.8.0
 Dialog DLL:      TCM.DLL V1.48.0.0
  
 <h2>Project:</h2>
-C:\Users\life\Documents\PROJECT\KEIL\Embedded-Systems-Project\Project_v1\MDK-ARM\Project_v1.uvprojx
+C:\Users\sarib\Desktop\Faculty\7. Semester\EE304\PROJECT\Version1\Embedded-Systems-Project\Project_v1\MDK-ARM\Project_v1.uvprojx
 Project File Date:  06/15/2021
 
 <h2>Output:</h2>
@@ -29,34 +29,32 @@ Project File Date:  06/15/2021
 Rebuild target 'Project_v1'
 assembling startup_stm32f103x6.s...
 compiling stm32f1xx_it.c...
-compiling LCD.c...
-LCD.h(37): warning:  #1-D: last line of file ends without a newline
-  void lcd_line2(void);
-LCD.c: 1 warning, 0 errors
 compiling main.c...
 ../Core/Src/../../Drivers/TC72_mesu/hal_tc72.h(20): warning:  #1-D: last line of file ends without a newline
   #endif /* __STM32F1xx_HAL_FLASH_H */
 ..\MDK-ARM\LCD.h(37): warning:  #1-D: last line of file ends without a newline
   void lcd_line2(void);
-../Core/Src/main.c(196): warning:  #940-D: missing return statement at end of non-void function "functionDHT11" 
-  }
-../Core/Src/main.c(211): warning:  #177-D: variable "k"  was declared but never referenced
+../Core/Src/main.c(84): warning:  #177-D: variable "k"  was declared but never referenced
   	uint8_t k;
-../Core/Src/main.c(212): warning:  #177-D: variable "ad1"  was declared but never referenced
+../Core/Src/main.c(85): warning:  #177-D: variable "ad1"  was declared but never referenced
   	uint32_t ad1, ad2;
-../Core/Src/main.c(212): warning:  #177-D: variable "ad2"  was declared but never referenced
+../Core/Src/main.c(85): warning:  #177-D: variable "ad2"  was declared but never referenced
   	uint32_t ad1, ad2;
-../Core/Src/main.c(249): warning:  #177-D: variable "i"  was declared but never referenced
+../Core/Src/main.c(120): warning:  #177-D: variable "i"  was declared but never referenced
    int i=0;
-../Core/Src/main.c: 7 warnings, 0 errors
+../Core/Src/main.c: 6 warnings, 0 errors
+compiling LCD.c...
+LCD.h(37): warning:  #1-D: last line of file ends without a newline
+  void lcd_line2(void);
+LCD.c: 1 warning, 0 errors
 compiling stm32f1xx_hal_gpio_ex.c...
 compiling stm32f1xx_hal_msp.c...
 compiling stm32f1xx_hal_adc.c...
 compiling stm32f1xx_hal.c...
 compiling stm32f1xx_hal_adc_ex.c...
 compiling stm32f1xx_hal_rcc.c...
-compiling stm32f1xx_hal_rcc_ex.c...
 compiling stm32f1xx_hal_gpio.c...
+compiling stm32f1xx_hal_rcc_ex.c...
 compiling stm32f1xx_hal_dma.c...
 compiling stm32f1xx_hal_cortex.c...
 compiling stm32f1xx_hal_pwr.c...
@@ -64,14 +62,14 @@ compiling stm32f1xx_hal_flash.c...
 compiling stm32f1xx_hal_exti.c...
 compiling stm32f1xx_hal_flash_ex.c...
 compiling stm32f1xx_hal_spi.c...
-compiling stm32f1xx_hal_uart.c...
-compiling stm32f1xx_hal_tim_ex.c...
 compiling stm32f1xx_hal_tim.c...
+compiling stm32f1xx_hal_tim_ex.c...
+compiling stm32f1xx_hal_uart.c...
 compiling system_stm32f1xx.c...
 linking...
-Program Size: Code=11772 RO-data=324 RW-data=24 ZI-data=1560  
+Program Size: Code=9888 RO-data=324 RW-data=20 ZI-data=1292  
 FromELF: creating hex file...
-"Project_v1\Project_v1.axf" - 0 Error(s), 8 Warning(s).
+"Project_v1\Project_v1.axf" - 0 Error(s), 7 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -88,14 +86,14 @@ Package Vendor: Keil
 
 <h2>Collection of Component include folders:</h2>
   .\RTE\_Project_v1
-  C:\Users\life\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include
-  C:\Users\life\AppData\Local\Arm\Packs\Keil\STM32F1xx_DFP\2.3.0\Device\Include
+  C:\Users\sarib\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include
+  C:\Users\sarib\AppData\Local\Arm\Packs\Keil\STM32F1xx_DFP\2.3.0\Device\Include
 
 <h2>Collection of Component Files used:</h2>
 
    * Component: ARM::CMSIS:CORE:5.4.0
       Include file:  CMSIS\Core\Include\tz_context.h
-Build Time Elapsed:  00:00:24
+Build Time Elapsed:  00:00:25
 </pre>
 </body>
 </html>
