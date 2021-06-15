@@ -226,7 +226,12 @@ int main(void)
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_Base_Start(&htim3); 
+	//LCD
  lcd_init(_LCD_4BIT, _LCD_FONT_5x8, _LCD_2LINE);
+ int i=0;
+ char yazi[32]=" ";
+ HAL_Delay(250);
+ //LCD END
 	HAL_TIM_OC_Start(&htim3, TIM_CHANNEL_1); //EKLENDI
   /* USER CODE END 2 */
 
@@ -293,10 +298,16 @@ int main(void)
 	//END read from temp sensor
 	len = sprintf(vterminal_data, "MSB= %d, LSB= %d\r\n", hc72_MSB,hc72_LSB);
 	HAL_UART_Transmit(&huart1,(uint8_t*)vterminal_data, len+1, HAL_MAX_DELAY);
-		lcd_print(1,1, "Temperature");
- lcd_print(2,1, "Humidity");
+	//LCD
+	lcd_print(1,1, "Temperature");
+ //lcd_print(2,1, "Humidity");
 			HAL_Delay(200);
 
+	//i++;
+	sprintf(yazi, "%d", hc72_MSB);
+	lcd_print(2,1,yazi);
+	HAL_Delay(30);
+	//LCD END
 		//HUMIDITY
 	 HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_14);
 	 if(functionDHT11(dhtVal) == 1){
