@@ -209,41 +209,11 @@ int main(void)
 	
 	while (1)
   {
-	//LED
-	if(flag==1){    
-      flag=0;
-			temp=((65535/(4096-ADC_value[0]))-13);
-			sprintf(yazi, "%d", ((65535/(4096-ADC_value[0]))-13));
-			lcd_print(1,1,yazi);
-      //temp = ADC_value[0];
-			y[counter] = temp;
-			HAL_Delay(1000);
-			if(ADC_value[0] < 1822){
-				HAL_GPIO_WritePin(GPIOB, GPIO_PIN_15, GPIO_PIN_SET);
-			}
-			else{
-				HAL_GPIO_WritePin(GPIOB, GPIO_PIN_15, GPIO_PIN_RESET);
-			}
-			
-			counter--;
-			HAL_Delay(100);
-			linearregression(10,x,y);
-			prediction = m*11+b;
-			//predictionx=((65535/(4096-prediction))-13);
-			HAL_Delay(100);
-			sprintf(yazi, "%d", prediction);
-			lcd_print(2,1,yazi);
-			HAL_Delay(100);
-   }
-	
-
 		
-
- 
-
-	//Read from temp sensor
+			//Read from temp sensor
 	len = sprintf(vterminal_data, "Read from the sensor... \r\n");
 	HAL_UART_Transmit(&huart1,(uint8_t*)vterminal_data, len+1, HAL_MAX_DELAY);
+	 
 	//CE enable
 	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_2, GPIO_PIN_SET);
 	spi_tx_data[0]= TEMPR_REG;
@@ -265,20 +235,52 @@ int main(void)
 	
 	hc72_LSB = spi_rx_data[0];
 	//CE disable
+	
 	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_2, GPIO_PIN_RESET);
 	HAL_Delay(10);
 	//END read from temp sensor
+	
 	len = sprintf(vterminal_data, "MSB= %d, LSB= %d\r\n", hc72_MSB,hc72_LSB);
 	HAL_UART_Transmit(&huart1,(uint8_t*)vterminal_data, len+1, HAL_MAX_DELAY);
+	
 	//LCD
-	//lcd_print(1,1, "Temperature");
+	lcd_print(1,1, "Temperature: ");
 			HAL_Delay(200);
-
 	//i++;
-	//sprintf(yazi, "%d", hc72_MSB);
-	//lcd_print(2,1,yazi);
+	sprintf(yazi, "%d", hc72_MSB);
+	lcd_print(1,13,yazi);
 	HAL_Delay(30);
 	//LCD END
+	
+	//LDR
+	if(flag==1){    
+      flag=0;
+			temp=((65535/(4096-ADC_value[0]))-13);
+			sprintf(yazi, "%d", ((65535/(4096-ADC_value[0]))-13));
+		  lcd_print(2,1, "Light Sensor Rate: ");
+			lcd_print(2,19,yazi);
+      //temp = ADC_value[0];
+			y[counter] = temp;
+			HAL_Delay(1000);
+			if(ADC_value[0] < 1822){
+				HAL_GPIO_WritePin(GPIOB, GPIO_PIN_15, GPIO_PIN_SET);
+			}
+			else{
+				HAL_GPIO_WritePin(GPIOB, GPIO_PIN_15, GPIO_PIN_RESET);
+			}
+			
+			counter--;		
+			HAL_Delay(100);
+			linearregression(10,x,y);
+			prediction = m*11+b;
+			//predictionx=((65535/(4096-prediction))-13);
+			HAL_Delay(100);
+			sprintf(yazi, "%d", prediction);
+			lcd_print(3,1,"Prediction LDR: ");
+			lcd_print(3,17,yazi);
+			HAL_Delay(100);
+   }
+	//LDR END
 
     /* USER CODE END WHILE */
 
