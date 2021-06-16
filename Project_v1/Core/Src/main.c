@@ -141,6 +141,7 @@ int main(void)
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
+	
 
   /* USER CODE END SysInit */
 
@@ -152,7 +153,7 @@ int main(void)
   MX_ADC1_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
-	
+	HAL_TIM_Base_Start_IT(&htim2);
 	//LDR
 	HAL_ADC_Start_DMA(&hadc1,(uint32_t*)&ADC_value,100);
   // LDR END
@@ -541,14 +542,14 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, GPIO_PIN_2|LCD_D7_Pin|GPIO_PIN_12|GPIO_PIN_13
                           |GPIO_PIN_14|GPIO_PIN_15|LCD_EN_Pin|LCD_RS_Pin
-                          |LCD_D4_Pin|LCD_D5_Pin|LCD_D6_Pin, GPIO_PIN_RESET);
+                          |LCD_D4_Pin|GPIO_PIN_7|LCD_D5_Pin|LCD_D6_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pins : PB2 LCD_D7_Pin PB12 PB13
                            PB14 PB15 LCD_EN_Pin LCD_RS_Pin
-                           LCD_D4_Pin LCD_D5_Pin LCD_D6_Pin */
+                           LCD_D4_Pin PB7 LCD_D5_Pin LCD_D6_Pin */
   GPIO_InitStruct.Pin = GPIO_PIN_2|LCD_D7_Pin|GPIO_PIN_12|GPIO_PIN_13
                           |GPIO_PIN_14|GPIO_PIN_15|LCD_EN_Pin|LCD_RS_Pin
-                          |LCD_D4_Pin|LCD_D5_Pin|LCD_D6_Pin;
+                          |LCD_D4_Pin|GPIO_PIN_7|LCD_D5_Pin|LCD_D6_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
