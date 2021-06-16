@@ -158,7 +158,7 @@ int main(void)
  int i=0;
  char yazi[32]=" ";
  HAL_Delay(250);
- //LCD END
+ //LCD END END
  
   /* USER CODE END 2 */
 
