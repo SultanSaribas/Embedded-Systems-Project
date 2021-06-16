@@ -81,7 +81,7 @@ static uint8_t b;
 static uint8_t r;
 
 //y=mx+b
-
+//Linear Regression Function
 void linearregression(uint8_t n, uint32_t x[], uint32_t y[]){
 	double sumx = 0.0;
 	double sumx2 = 0.0;
@@ -126,7 +126,7 @@ int main(void)
 	uint32_t ADC_value[100];
 	uint8_t k;
 	uint32_t ad1, ad2;
-	//end
+	//LED END
 
   /* USER CODE END 1 */
 
@@ -160,7 +160,7 @@ int main(void)
 	HAL_TIM_Base_Start_IT(&htim2);
 	//LDR
 	HAL_ADC_Start_DMA(&hadc1,(uint32_t*)&ADC_value,100);
-  // LDR END
+  //LDR END
 
 	//LCD
  lcd_init(_LCD_4BIT, _LCD_FONT_5x8, _LCD_2LINE);
@@ -180,8 +180,7 @@ int main(void)
 	uint8_t spi_rx_data[]= {0};
 	uint8_t hc72_MSB =0;
 	uint8_t hc72_LSB =0;
-//	HAL_UART_Transmit(&huart1,(uint8_t*)vterminal_data, len+1, HAL_MAX_DELAY);
- // HAL_Delay(1000);
+
 	len = sprintf(vterminal_data, "Configuring sensor... \r\n");
 	HAL_UART_Transmit(&huart1,(uint8_t*)vterminal_data, len+1, HAL_MAX_DELAY);
   
@@ -210,20 +209,16 @@ int main(void)
 	
 	uint8_t counter = 10;
 	uint8_t n = 10;
-  //uint32_t x[25]={1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25};	//times
-  uint32_t x[10]={1,2,3,4,5,6,7,8,9,10};
+  uint32_t x[10]={1,2,3,4,5,6,7,8,9,10}; //times
 	uint32_t y[10]={15,15,15,15,15,15,15,15,15,15}; // values
-  //y[0] = 1822;
 	uint8_t prediction;
 	uint8_t predictionx;
 	uint8_t temp=0;
-	//uint32_t x[6]= {1, 2, 3,  4,  5, 6};
-  //uint32_t y[6]= {1, 2, 4,  5,  10, 20};
 	
 	while (1)
   {
 		
-			//Read from temp sensor
+	//Read from temp sensor
 	len = sprintf(vterminal_data, "Read from the sensor... \r\n");
 	HAL_UART_Transmit(&huart1,(uint8_t*)vterminal_data, len+1, HAL_MAX_DELAY);
 	 
@@ -259,7 +254,7 @@ int main(void)
 	//LCD
 	lcd_print(1,1, "Temperature: ");
 	HAL_Delay(200);
-	//i++;
+
 	sprintf(yazi, "%d", hc72_MSB);
 	lcd_print(1,13,yazi);
 	HAL_Delay(30);
@@ -285,7 +280,7 @@ int main(void)
 			sprintf(yazi, "%d", ((65535/(4096-ADC_value[0]))-13));
 		  lcd_print(2,1, "Light Sensor Rate: ");
 			lcd_print(2,19,yazi);
-      //temp = ADC_value[0];
+      
 			y[counter] = temp;
 			HAL_Delay(1000);
 			if(ADC_value[0] < 1822){
@@ -299,7 +294,7 @@ int main(void)
 			HAL_Delay(100);
 			linearregression(10,x,y);
 			prediction = m*11+b;
-			//predictionx=((65535/(4096-prediction))-13);
+
 			HAL_Delay(100);
 			sprintf(yazi, "%d", prediction);
 			lcd_print(3,1,"Prediction LDR: ");
